@@ -4,6 +4,7 @@
 #include <intrepid_streaming_msgs/CompressedUGVStream.h>
 
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointField.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 
@@ -22,6 +23,9 @@ inline float to_m(const int16_t& v)
 }
 
 ros::Publisher decompressed_publisher_;
+ros::Publisher lidar_publisher_;
+ros::Publisher rgb_publisher_;
+ros::Publisher depth_publisher_;
 
 sensor_msgs::PointCloud2 decompress_lidar_msg(const sensor_msgs::PointCloud2& msg)
 {
@@ -194,15 +198,24 @@ void inputCallback(const intrepid_streaming_msgs::CompressedUGVStream& compresse
 
    // publish decompressed_input
    decompressed_publisher_.publish(decompressed_input);
+   lidar_publisher_.publish(decompressed_input.lidar);
+   rgb_publisher_.publish(decompressed_input.image);
+   depth_publisher_.publish(decompressed_input.depth);
 }
 
 
 int main(int argc, char **argv)
 {
+  ros::init(argc, argv, "intrepid_streaming_client");
   ros::NodeHandle nh;
 
   ros::Subscriber compressed_subscriber = nh.subscribe("compressed_ugv_stream", 1, inputCallback);
   decompressed_publisher_ = nh.advertise<intrepid_streaming_msgs::UGVStream>("ugv_stream", 1);
+  lidar_publisher_ = nh.advertise<sensor_msgs::PointCloud2>("lidar_stream", 1);
+  rgb_publisher_ = nh.advertise<sensor_msgs::Image>("rgb_stream", 1);
+  depth_publisher_ = nh.advertise<sensor_msgs::Image>("depth_stream", 1);
+
+  ros::spin();  
 
   return 0;
 }

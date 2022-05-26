@@ -113,6 +113,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_m
 
 int main(int argc, char **argv)
 {
+  ros::init(argc, argv, "intrepid_streaming_server");
   // subscribe to lidar, images, camera info, etc and publish
   ros::NodeHandle nh;
   compressed_publisher_ = nh.advertise<intrepid_streaming_msgs::CompressedUGVStream>("compressed_ugv_stream", 1);
@@ -121,7 +122,7 @@ int main(int argc, char **argv)
   message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/camera/color/image_raw/compressed", 1);
   message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/camera/aligned_depth_to_color/image_raw/compressed", 1);
   message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/camera/color/camera_info", 1);
-  message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_pose_subscriber(nh, "/rtpm", 1);
+  message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_pose_subscriber(nh, "/robot/gps/filtered", 1);
 
   message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, ugv_pose_subscriber);
   sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
@@ -131,6 +132,15 @@ int main(int argc, char **argv)
   tf::Quaternion quaternion;
   geometry_msgs::Pose lidar_pose_, camera_pose_;
 
+   try{
+     listener.waitForTransform("/robot_top_3d_laser_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
+   }
+   catch( tf::TransformException ex)
+   {
+     ROS_ERROR("transfrom exception : %s",ex.what());
+     return 0;
+   }
+
   listener.lookupTransform("/robot_top_3d_laser_link", "/robot_base_link",
    ros::Time(0), lidar_transform);
    lidar_pose_.position.x = lidar_transform.getOrigin().x();
@@ -139,6 +149,16 @@ int main(int argc, char **argv)
    quaternion = lidar_transform.getRotation();
    tf::quaternionTFToMsg(quaternion, lidar_pose_.orientation);
 
+   
+   try{
+     listener.waitForTransform("/camera_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
+   }
+   catch( tf::TransformException ex)
+   {
+     ROS_ERROR("transfrom exception : %s",ex.what());
+     return 0;
+   }
+
    listener.lookupTransform("/camera_link", "/robot_base_link",
     ros::Time(0), camera_transform);
     camera_pose_.position.x = camera_transform.getOrigin().x();
@@ -146,6 +166,8 @@ int main(int argc, char **argv)
     camera_pose_.position.z = camera_transform.getOrigin().z();
     quaternion = camera_transform.getRotation();
     tf::quaternionTFToMsg(quaternion, camera_pose_.orientation);
+
+   ros::spin();
 
    return 0;
 }
