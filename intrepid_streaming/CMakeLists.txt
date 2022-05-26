@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   intrepid_streaming_msgs
   tf
   cv_bridge
+  nimbro_topic_transport
 )
 
 ## System dependencies are found with CMake's conventions
