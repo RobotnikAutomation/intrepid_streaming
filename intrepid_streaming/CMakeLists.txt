@@ -7,17 +7,21 @@ project(intrepid_streaming)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+find_package(OpenCV REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   sensor_msgs
   std_msgs
   intrepid_streaming_msgs
+  tf
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LZ4 REQUIRED liblz4)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -51,8 +55,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   Message1.msg
-#   Message2.msg
+#   CompressedUGVStream.msg
+#   UGVStream.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -106,9 +110,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES intrepid_streaming
-#  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs
-#  DEPENDS system_lib
+  LIBRARIES intrepid_streaming
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs intrepid_streaming_msgs tf cv_bridge
+  DEPENDS OpenCV
 )
 
 ###########
@@ -120,6 +124,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -149,12 +154,15 @@ add_executable(client src/client.cpp)
 add_dependencies(server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(client ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-## Specify libraries to link a library or executable target against
 target_link_libraries(server
   ${catkin_LIBRARIES}
+  ${LZ4_LIBRARIES}
 )
+
 target_link_libraries(client
   ${catkin_LIBRARIES}
+  ${LZ4_LIBRARIES}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 #############
