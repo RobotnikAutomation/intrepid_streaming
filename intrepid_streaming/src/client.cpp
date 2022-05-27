@@ -415,13 +415,14 @@ void inputCallback(const intrepid_streaming_msgs::CompressedUGVStream& compresse
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "intrepid_streaming_client");
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("");
+  ros::NodeHandle pnh("~");
 
   ros::Subscriber compressed_subscriber = nh.subscribe("compressed_ugv_stream", 1, inputCallback);
-  decompressed_publisher_ = nh.advertise<intrepid_streaming_msgs::UGVStream>("ugv_stream", 1);
-  lidar_publisher_ = nh.advertise<sensor_msgs::PointCloud2>("lidar_stream", 1);
-  rgb_publisher_ = nh.advertise<sensor_msgs::Image>("rgb_stream", 1);
-  depth_publisher_ = nh.advertise<sensor_msgs::Image>("depth_stream", 1);
+  decompressed_publisher_ = pnh.advertise<intrepid_streaming_msgs::UGVStream>("ugv_stream", 1);
+  lidar_publisher_ = pnh.advertise<sensor_msgs::PointCloud2>("debug/lidar", 1);
+  rgb_publisher_ = pnh.advertise<sensor_msgs::Image>("debug/image", 1);
+  depth_publisher_ = pnh.advertise<sensor_msgs::Image>("debug/depth", 1);
 
   ros::spin();
 
