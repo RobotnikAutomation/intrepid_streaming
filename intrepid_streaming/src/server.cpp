@@ -141,7 +141,7 @@ int main(int argc, char **argv)
    }
    catch( tf::TransformException ex)
    {
-     ROS_ERROR("transfrom exception : %s",ex.what());
+     ROS_ERROR("transform exception : %s",ex.what());
      return 0;
    }
 
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
    }
    catch( tf::TransformException ex)
    {
-     ROS_ERROR("transfrom exception : %s",ex.what());
+     ROS_ERROR("transform exception : %s",ex.what());
      return 0;
    }
 
