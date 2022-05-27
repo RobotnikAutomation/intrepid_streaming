@@ -119,7 +119,7 @@ sensor_msgs::PointCloud2 decompress_lidar_msg(const sensor_msgs::PointCloud2& ms
 
   input.data = uncompressed;
 
-  ROS_INFO_THROTTLE(1, "descomprimiendo");
+  // ROS_INFO_THROTTLE(1, "decompressing");
 
   sensor_msgs::PointCloud2Modifier modifier(output);
 

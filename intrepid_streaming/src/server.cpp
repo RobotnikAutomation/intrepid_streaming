@@ -135,14 +135,23 @@ int main(int argc, char **argv)
   tf::TransformListener listener;
   tf::StampedTransform lidar_transform, camera_transform;
   tf::Quaternion quaternion;
+  bool transforms_received;
 
-   try{
-     listener.waitForTransform("/robot_top_3d_laser_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
-   }
-   catch( tf::TransformException ex)
+   while (!transforms_received)
    {
-     ROS_ERROR("transform exception : %s",ex.what());
-     return 0;
+     transforms_received = true;
+
+     if(listener.waitForTransform("/robot_top_3d_laser_link", "/robot_base_link", ros::Time(0), ros::Duration(1.0)) == false)
+     {
+       ROS_WARN_STREAM("Waiting for transform from robot_top_3d_laser_link to robot_base_link");
+       transforms_received = false;
+     }
+
+     if(listener.waitForTransform("/camera_link", "/robot_base_link", ros::Time(0), ros::Duration(1.0)) == false)
+     {
+       ROS_WARN_STREAM("Waiting for transform from camera_link to robot_base_link");
+       transforms_received = false;
+     }
    }
 
    listener.lookupTransform("/robot_top_3d_laser_link", "/robot_base_link",
@@ -152,15 +161,6 @@ int main(int argc, char **argv)
    lidar_pose_.position.z = lidar_transform.getOrigin().z();
    quaternion = lidar_transform.getRotation();
    tf::quaternionTFToMsg(quaternion, lidar_pose_.orientation);
-
-   try{
-     listener.waitForTransform("/camera_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
-   }
-   catch( tf::TransformException ex)
-   {
-     ROS_ERROR("transform exception : %s",ex.what());
-     return 0;
-   }
 
    listener.lookupTransform("/camera_link", "/robot_base_link",
    ros::Time(0), camera_transform);
