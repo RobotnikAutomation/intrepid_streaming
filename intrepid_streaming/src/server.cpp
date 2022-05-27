@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 
   message_filters::Subscriber<sensor_msgs::PointCloud2> lidar_subscriber(nh, "/robot/top_3d_laser/scan/filtered", 1);
   message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/camera/color/image_raw/compressed", 1);
-  message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/camera/aligned_depth_to_color/image_raw/compressed", 1);
+  message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/camera/aligned_depth_to_color/image_raw/compressedDepth", 1);
   message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/camera/color/camera_info", 1);
   message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_pose_subscriber(nh, "/robot/gps/filtered", 1);
 
@@ -149,7 +149,7 @@ int main(int argc, char **argv)
    quaternion = lidar_transform.getRotation();
    tf::quaternionTFToMsg(quaternion, lidar_pose_.orientation);
 
-   
+
    try{
      listener.waitForTransform("/camera_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
    }
