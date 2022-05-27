@@ -14,9 +14,11 @@
 
 #include <lz4.h>
 
-typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo, sensor_msgs::NavSatFix> testSyncPolicy;
-
 geometry_msgs::Pose lidar_pose_, camera_pose_;
+
+typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo, sensor_msgs::NavSatFix> testSyncPolicy;
+//typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo> testSyncPolicy;
+
 ros::Publisher compressed_publisher_;
 
 inline int16_t to_cm_and_clamp(const float& v)
@@ -97,6 +99,7 @@ sensor_msgs::PointCloud2 compress_lidar_msg(const sensor_msgs::PointCloud2& inpu
 
 // Callback function
 void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info, const sensor_msgs::NavSatFixConstPtr &ugv_pose)  // The callback contains multiple messages
+//void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info)  // The callback contains multiple messages
 {
   intrepid_streaming_msgs::CompressedUGVStream msg;
   msg.header.stamp = ros::Time::now();
@@ -125,12 +128,13 @@ int main(int argc, char **argv)
   message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_pose_subscriber(nh, "/robot/gps/filtered", 1);
 
   message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, ugv_pose_subscriber);
+//  message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber);
   sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
+//  sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
 
   tf::TransformListener listener;
   tf::StampedTransform lidar_transform, camera_transform;
   tf::Quaternion quaternion;
-  geometry_msgs::Pose lidar_pose_, camera_pose_;
 
    try{
      listener.waitForTransform("/robot_top_3d_laser_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
@@ -141,14 +145,13 @@ int main(int argc, char **argv)
      return 0;
    }
 
-  listener.lookupTransform("/robot_top_3d_laser_link", "/robot_base_link",
+   listener.lookupTransform("/robot_top_3d_laser_link", "/robot_base_link",
    ros::Time(0), lidar_transform);
    lidar_pose_.position.x = lidar_transform.getOrigin().x();
    lidar_pose_.position.y = lidar_transform.getOrigin().y();
    lidar_pose_.position.z = lidar_transform.getOrigin().z();
    quaternion = lidar_transform.getRotation();
    tf::quaternionTFToMsg(quaternion, lidar_pose_.orientation);
-
 
    try{
      listener.waitForTransform("/camera_link", "/robot_base_link", ros::Time::now(), ros::Duration(1.0));
@@ -160,12 +163,12 @@ int main(int argc, char **argv)
    }
 
    listener.lookupTransform("/camera_link", "/robot_base_link",
-    ros::Time(0), camera_transform);
-    camera_pose_.position.x = camera_transform.getOrigin().x();
-    camera_pose_.position.y = camera_transform.getOrigin().y();
-    camera_pose_.position.z = camera_transform.getOrigin().z();
-    quaternion = camera_transform.getRotation();
-    tf::quaternionTFToMsg(quaternion, camera_pose_.orientation);
+   ros::Time(0), camera_transform);
+   camera_pose_.position.x = camera_transform.getOrigin().x();
+   camera_pose_.position.y = camera_transform.getOrigin().y();
+   camera_pose_.position.z = camera_transform.getOrigin().z();
+   quaternion = camera_transform.getRotation();
+   tf::quaternionTFToMsg(quaternion, camera_pose_.orientation);
 
    ros::spin();
 
