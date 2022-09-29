@@ -16,8 +16,8 @@
 
 geometry_msgs::Pose lidar_pose_, camera_pose_;
 
-typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo, sensor_msgs::NavSatFix> testSyncPolicy;
-//typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo> testSyncPolicy;
+// typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo, sensor_msgs::NavSatFix> testSyncPolicy;
+typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo> testSyncPolicy;
 
 ros::Publisher compressed_publisher_;
 
@@ -98,8 +98,8 @@ sensor_msgs::PointCloud2 compress_lidar_msg(const sensor_msgs::PointCloud2& inpu
 }
 
 // Callback function
-void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info, const sensor_msgs::NavSatFixConstPtr &ugv_pose)  // The callback contains multiple messages
-//void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info)  // The callback contains multiple messages
+// void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info, const sensor_msgs::NavSatFixConstPtr &ugv_pose)  // The callback contains multiple messages
+void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info)  // The callback contains multiple messages
 {
   intrepid_streaming_msgs::CompressedUGVStream msg;
   msg.header.stamp = ros::Time::now();
@@ -107,7 +107,7 @@ void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_m
   msg.image = *rgb_image;
   msg.depth = *depth_image;
   msg.camera_info = *camera_info;
-  msg.ugv_pose = *ugv_pose;
+  // msg.ugv_pose = *ugv_pose;
   msg.lidar_pose = lidar_pose_;
   msg.camera_pose = camera_pose_;
 
@@ -121,16 +121,16 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   compressed_publisher_ = nh.advertise<intrepid_streaming_msgs::CompressedUGVStream>("compressed_ugv_stream", 1);
 
-  message_filters::Subscriber<sensor_msgs::PointCloud2> lidar_subscriber(nh, "/robot/top_3d_laser/scan/filtered", 1);
-  message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/camera/color/image_raw/compressed", 1);
-  message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/camera/aligned_depth_to_color/image_raw/compressedDepth", 1);
-  message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/camera/color/camera_info", 1);
+  message_filters::Subscriber<sensor_msgs::PointCloud2> lidar_subscriber(nh, "/robot/top_3d_laser/points/filtered", 1);
+  message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/robot/camera_ugv/color/image_raw/compressed", 1);
+  message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/robot/camera_ugv/aligned_depth_to_color/image_raw/compressedDepth", 1);
+  message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/robot/camera_ugv/color/camera_info", 1);
   message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_pose_subscriber(nh, "/robot/gps/filtered", 1);
 
-  message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, ugv_pose_subscriber);
-//  message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber);
-  sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
-//  sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
+  // message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, ugv_pose_subscriber);
+ message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber);
+  // sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
+ sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
 
   tf::TransformListener listener;
   tf::StampedTransform lidar_transform, camera_transform;
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
        transforms_received = false;
      }
 
-     if(listener.waitForTransform("/camera_link", "/robot_base_link", ros::Time(0), ros::Duration(1.0)) == false)
+     if(listener.waitForTransform("/camera_ugv_link", "/robot_base_link", ros::Time(0), ros::Duration(1.0)) == false)
      {
        ROS_WARN_STREAM("Waiting for transform from camera_link to robot_base_link");
        transforms_received = false;
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
    quaternion = lidar_transform.getRotation();
    tf::quaternionTFToMsg(quaternion, lidar_pose_.orientation);
 
-   listener.lookupTransform("/camera_link", "/robot_base_link",
+   listener.lookupTransform("/camera_ugv_link", "/robot_base_link",
    ros::Time(0), camera_transform);
    camera_pose_.position.x = camera_transform.getOrigin().x();
    camera_pose_.position.y = camera_transform.getOrigin().y();
