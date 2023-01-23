@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="server_ip" default="192.168.0.28" />
+  <arg name="server_ip" default="192.168.20.151" />
 
   <arg name="allow_bidirectional" default="false"/>
 
@@ -10,7 +10,7 @@
   <node name="tcp_sender" pkg="nimbro_topic_transport" type="tcp_sender" output="screen">
     <!-- destination host name or IP address -->
     <param name="destination_addr" value="$(arg server_ip)"/>
-    <param name="destination_port" value="17002"/>
+    <param name="destination_port" value="17001"/>
     <!-- load the list of topics from YAML file -->
     <rosparam command="load" file="$(find intrepid_streaming)/config/server_topics.yaml"/>
     <!-- if bidirectional traffic over a topic is expected, fill this parameter -->
