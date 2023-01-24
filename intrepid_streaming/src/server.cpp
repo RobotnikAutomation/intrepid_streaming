@@ -2,6 +2,7 @@
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
+#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/PointField.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
@@ -99,12 +100,13 @@ sensor_msgs::PointCloud2 compress_lidar_msg(const sensor_msgs::PointCloud2& inpu
 
 // Callback function
 // void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info, const sensor_msgs::NavSatFixConstPtr &ugv_pose)  // The callback contains multiple messages
-void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info)  // The callback contains multiple messages
+void callback(const sensor_msgs::PointCloud2ConstPtr &pointcloud, const sensor_msgs::CompressedImageConstPtr &rgb_image, const sensor_msgs::CompressedImageConstPtr &depth_image,const sensor_msgs::CameraInfoConstPtr &camera_info, const sensor_msgs::ImuConstPtr &imu_data)  // The callback contains multiple messages
 {
   intrepid_streaming_msgs::CompressedUGVStream msg;
   msg.header.stamp = ros::Time::now();
   msg.lidar = compress_lidar_msg(*pointcloud);
   msg.image = *rgb_image;
+  msg.imu = *imu_data;
   msg.depth = *depth_image;
   msg.camera_info = *camera_info;
   // msg.ugv_pose = *ugv_pose;
@@ -126,11 +128,12 @@ int main(int argc, char **argv)
   message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/robot/camera_ugv/aligned_depth_to_color/image_raw/compressedDepth", 1);
   message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/robot/camera_ugv/color/camera_info", 1);
   message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_pose_subscriber(nh, "/robot/gps/filtered", 1);
+  message_filters::Subscriber<sensor_msgs::Imu> imu_subscriber(nh, "/robot/imu/data", 1);
 
   // message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, ugv_pose_subscriber);
- message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber);
+ message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(10), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, imu_subscriber);
   // sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
- sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
+ sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
 
   tf::TransformListener listener;
   tf::StampedTransform lidar_transform, camera_transform;

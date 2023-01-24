@@ -9,6 +9,7 @@
 
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointField.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 
@@ -46,6 +47,7 @@ ros::Publisher decompressed_publisher_;
 ros::Publisher lidar_publisher_;
 ros::Publisher rgb_publisher_;
 ros::Publisher depth_publisher_;
+ros::Publisher imu_publisher_;
 
 int *buffer_;
 int *pBuffer_;
@@ -358,7 +360,7 @@ sensor_msgs::Image decodeCompressedDepthImage(const sensor_msgs::CompressedImage
       if (compression_format == "png") {
         try
         {
-          cv_ptr->image = cv::imdecode(imageData, CV_LOAD_IMAGE_UNCHANGED);
+          cv_ptr->image = cv::imdecode(imageData, cv::IMREAD_UNCHANGED);
         }
         catch (cv::Exception& e)
         {
@@ -400,6 +402,7 @@ void inputCallback(const intrepid_streaming_msgs::CompressedUGVStream& compresse
    decompressed_input.image = decompress_rgb_image_msg(compressed_input.image, cv::IMREAD_COLOR);
    decompressed_input.depth = decodeCompressedDepthImage(compressed_input.depth);
    decompressed_input.camera_info = compressed_input.camera_info;
+   decompressed_input.imu = compressed_input.imu;
    decompressed_input.ugv_pose = compressed_input.ugv_pose;
    decompressed_input.lidar_pose = compressed_input.lidar_pose;
    decompressed_input.camera_pose = compressed_input.camera_pose;
@@ -409,6 +412,7 @@ void inputCallback(const intrepid_streaming_msgs::CompressedUGVStream& compresse
    lidar_publisher_.publish(decompressed_input.lidar);
    rgb_publisher_.publish(decompressed_input.image);
    depth_publisher_.publish(decompressed_input.depth);
+   imu_publisher_.publish(decompressed_input.imu);
 }
 
 
@@ -423,6 +427,7 @@ int main(int argc, char **argv)
   lidar_publisher_ = pnh.advertise<sensor_msgs::PointCloud2>("debug/lidar", 1);
   rgb_publisher_ = pnh.advertise<sensor_msgs::Image>("debug/image", 1);
   depth_publisher_ = pnh.advertise<sensor_msgs::Image>("debug/depth", 1);
+  imu_publisher_ = pnh.advertise<sensor_msgs::Imu>("debug/imu", 1);
 
   ros::spin();
 
