@@ -18,7 +18,7 @@
 geometry_msgs::Pose lidar_pose_, camera_pose_;
 
 // typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo, sensor_msgs::NavSatFix> testSyncPolicy;
-typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo>, sensor_msgs::Imu testSyncPolicy;
+typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, sensor_msgs::CompressedImage, sensor_msgs::CompressedImage, sensor_msgs::CameraInfo, sensor_msgs::Imu> testSyncPolicy;
 
 ros::Publisher compressed_publisher_;
 
