@@ -10,6 +10,7 @@ project(intrepid_streaming)
 find_package(OpenCV REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  nav_msgs
   roscpp
   sensor_msgs
   std_msgs
@@ -112,7 +113,7 @@ pkg_check_modules(LZ4 REQUIRED liblz4)
 catkin_package(
 #  INCLUDE_DIRS include
   LIBRARIES intrepid_streaming
-  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs std_msgs intrepid_streaming_msgs tf cv_bridge
+  CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs nav_msgs std_msgs intrepid_streaming_msgs tf cv_bridge
   DEPENDS OpenCV
 )
 

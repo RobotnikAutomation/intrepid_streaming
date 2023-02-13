@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   geometry_msgs
+  nav_msgs
   sensor_msgs
 )
 
@@ -27,12 +28,13 @@ generate_messages(
   DEPENDENCIES
   std_msgs
   geometry_msgs
+  nav_msgs
   sensor_msgs
 )
 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES intrepid_streaming_msgs
- CATKIN_DEPENDS message_runtime std_msgs geometry_msgs sensor_msgs
+ CATKIN_DEPENDS message_runtime std_msgs geometry_msgs nav_msgs sensor_msgs
 #  DEPENDS system_lib
 )

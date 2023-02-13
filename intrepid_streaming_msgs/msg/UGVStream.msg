@@ -12,8 +12,11 @@ sensor_msgs/Image depth
 # calibration info from camera
 sensor_msgs/CameraInfo camera_info
 
-# Imu message
-sensor_msgs/Imu imu
+# GPS message
+sensor_msgs/NavSatFix ugv_position
+
+# Orientation message
+geometry_msgs/Quaternion ugv_orientation
 
 # ugv pose in world coordinates
 sensor_msgs/NavSatFix ugv_pose

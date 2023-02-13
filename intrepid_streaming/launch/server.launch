@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="server_ip" default="192.168.20.151" />
+  <arg name="server_ip" default="192.168.22.146" />
 
   <arg name="allow_bidirectional" default="false"/>
 
