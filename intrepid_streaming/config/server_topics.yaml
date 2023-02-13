@@ -1,2 +1,3 @@
 topics:
   - name: "/compressed_ugv_stream"
+  - name: "/robot/imu/data"
