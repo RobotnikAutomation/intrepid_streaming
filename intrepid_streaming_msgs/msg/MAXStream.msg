@@ -3,14 +3,23 @@ std_msgs/Header header
 # pointcloud coming from lidar synchronized with camera images
 sensor_msgs/PointCloud2 lidar
 
+# Lidar sensor type
+std_msgs/String lidar_type
+
 # rgb image synchronized with depth image and lidar
 sensor_msgs/Image image
 
 # depth image synchronized with rgb image and lidar
 sensor_msgs/Image depth
 
-# calibration info from camera
-sensor_msgs/CameraInfo camera_info
+# thermal image synchronized
+sensor_msgs/Image thermal
+
+# calibration info from depth camera
+sensor_msgs/CameraInfo camera_info_depth
+
+# calibration info from thermal camera
+sensor_msgs/CameraInfo camera_info_thermal
 
 # GPS message
 sensor_msgs/NavSatFix ugv_position
@@ -24,5 +33,11 @@ sensor_msgs/NavSatFix ugv_pose
 # lidar pose with respect to ugv base_link
 geometry_msgs/Pose lidar_pose
 
-# camera pose with respect to ugv base_link
-geometry_msgs/Pose camera_pose
+# depth camera pose with respect to ugv base_link
+geometry_msgs/Pose depth_camera_pose
+
+# thermal camera pose with respect to ugv base_link
+geometry_msgs/Pose thermal_camera_pose
+
+
+

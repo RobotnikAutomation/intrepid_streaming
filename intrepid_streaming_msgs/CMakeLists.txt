@@ -13,6 +13,8 @@ add_message_files(
    FILES
    CompressedUGVStream.msg
    UGVStream.msg
+   CompressedMAXStream.msg
+   MAXStream.msg
 )
 
 #add_service_files(

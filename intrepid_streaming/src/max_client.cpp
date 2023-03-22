@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <intrepid_streaming_msgs/UGVStream.h>
-#include <intrepid_streaming_msgs/CompressedUGVStream.h>
+#include <intrepid_streaming_msgs/MAXStream.h>
 
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Image.h>
@@ -394,19 +393,28 @@ sensor_msgs::Image decodeCompressedDepthImage(const sensor_msgs::CompressedImage
   return sensor_msgs::Image();
 }
 
-void inputCallback(const intrepid_streaming_msgs::CompressedUGVStream& compressed_input)
+void inputCallback(const intrepid_streaming_msgs::MAXStream& compressed_input)
 {
-   intrepid_streaming_msgs::UGVStream decompressed_input;
+   intrepid_streaming_msgs::MAXStream decompressed_input;
 
    // decompress input into decompressed_input
-   decompressed_input.lidar = decompress_lidar_msg(compressed_input.lidar);
-   decompressed_input.image = decompress_rgb_image_msg(compressed_input.image, cv::IMREAD_COLOR);
-   decompressed_input.depth = decodeCompressedDepthImage(compressed_input.depth);
-   decompressed_input.camera_info = compressed_input.camera_info;
+   //decompressed_input.lidar = decompress_lidar_msg(compressed_input.lidar);
+   decompressed_input.lidar = compressed_input.lidar;
+   //decompressed_input.image = decompress_rgb_image_msg(compressed_input.image, cv::IMREAD_COLOR);
+   //decompressed_input.depth = decodeCompressedDepthImage(compressed_input.depth);
+   //decompressed_input.thermal = decompress_rgb_image_msg(compressed_input.thermal, cv::IMREAD_GRAYSCALE);
+   decompressed_input.image = compressed_input.image;
+   decompressed_input.depth = compressed_input.depth;
+   decompressed_input.thermal = compressed_input.thermal; 
+    
+
+   decompressed_input.camera_info_depth = compressed_input.camera_info_depth;
+   decompressed_input.camera_info_thermal = compressed_input.camera_info_thermal;
    decompressed_input.ugv_position = compressed_input.ugv_position;
    decompressed_input.ugv_orientation = compressed_input.ugv_orientation;
    decompressed_input.lidar_pose = compressed_input.lidar_pose;
-   decompressed_input.camera_pose = compressed_input.camera_pose;
+   decompressed_input.depth_camera_pose = compressed_input.depth_camera_pose;
+   decompressed_input.thermal_camera_pose = compressed_input.thermal_camera_pose;
 
    // publish decompressed_input
    decompressed_publisher_.publish(decompressed_input);
@@ -419,17 +427,17 @@ void inputCallback(const intrepid_streaming_msgs::CompressedUGVStream& compresse
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "intrepid_streaming_client");
+  ros::init(argc, argv, "intrepid_max_streaming_client");
   ros::NodeHandle nh("");
   ros::NodeHandle pnh("~");
 
-  ros::Subscriber compressed_subscriber = nh.subscribe("compressed_ugv_stream", 1, inputCallback);
-  decompressed_publisher_ = pnh.advertise<intrepid_streaming_msgs::UGVStream>("ugv_stream", 1);
-  lidar_publisher_ = pnh.advertise<sensor_msgs::PointCloud2>("debug/lidar", 1);
-  rgb_publisher_ = pnh.advertise<sensor_msgs::Image>("debug/image", 1);
-  depth_publisher_ = pnh.advertise<sensor_msgs::Image>("debug/depth", 1);
-  ugv_position_publisher_ = pnh.advertise<sensor_msgs::NavSatFix>("debug/ugv_position", 1);
-  ugv_orientation_publisher_ = pnh.advertise<geometry_msgs::Quaternion>("debug/ugv_orientation", 1);
+  ros::Subscriber compressed_subscriber = nh.subscribe("compressed_max_stream", 1, inputCallback);
+  decompressed_publisher_ = pnh.advertise<intrepid_streaming_msgs::MAXStream>("max_stream", 1);
+  lidar_publisher_ = pnh.advertise<sensor_msgs::PointCloud2>("debug_max/lidar", 1);
+  rgb_publisher_ = pnh.advertise<sensor_msgs::Image>("debug_max/image", 1);
+  depth_publisher_ = pnh.advertise<sensor_msgs::Image>("debug_max/depth", 1);
+  ugv_position_publisher_ = pnh.advertise<sensor_msgs::NavSatFix>("debug_max/ugv_position", 1);
+  ugv_orientation_publisher_ = pnh.advertise<geometry_msgs::Quaternion>("debug_max/ugv_orientation", 1);
 
   ros::spin();
 

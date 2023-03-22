@@ -144,6 +144,8 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(server src/server.cpp)
 add_executable(client src/client.cpp)
+add_executable(max_server src/max_server.cpp)
+add_executable(max_client src/max_client.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,6 +157,8 @@ add_executable(client src/client.cpp)
 ## same as for the library above
 add_dependencies(server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(client ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(max_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(max_client ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(server
   ${catkin_LIBRARIES}
@@ -162,6 +166,17 @@ target_link_libraries(server
 )
 
 target_link_libraries(client
+  ${catkin_LIBRARIES}
+  ${LZ4_LIBRARIES}
+  ${OpenCV_INCLUDE_DIRS}
+)
+
+target_link_libraries(max_server
+  ${catkin_LIBRARIES}
+  ${LZ4_LIBRARIES}
+)
+
+target_link_libraries(max_client
   ${catkin_LIBRARIES}
   ${LZ4_LIBRARIES}
   ${OpenCV_INCLUDE_DIRS}

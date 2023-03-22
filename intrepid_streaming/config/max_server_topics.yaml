@@ -1,0 +1,3 @@
+topics:
+  - name: "/compressed_max_stream"
+  - name: "/mavros/imu/data"

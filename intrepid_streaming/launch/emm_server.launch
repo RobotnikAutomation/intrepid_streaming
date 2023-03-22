@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="server_ip" default="192.168.22.232" />
-  <!--<arg name="server_ip" default="172.25.63.64" />-->
+  <!--<arg name="server_ip" default="192.168.196.136" />-->
+  <arg name="server_ip" default="172.25.63.64" />
 
   <arg name="allow_bidirectional" default="false"/>
 
-  <node name="streaming_server" pkg="intrepid_streaming" type="server" output="screen"/>
+  <node name="streaming_server_emm" pkg="intrepid_streaming" type="max_server" output="screen"/>
 
   <!-- TCP sender node -->
-  <node name="tcp_sender" pkg="nimbro_topic_transport" type="tcp_sender" output="screen">
+  <node name="tcp_sender_emm" pkg="nimbro_topic_transport" type="tcp_sender" output="screen">
     <!-- destination host name or IP address -->
     <param name="destination_addr" value="$(arg server_ip)"/>
-    <param name="destination_port" value="17002"/>
+    <param name="destination_port" value="17003"/>
     <!-- load the list of topics from YAML file -->
-    <rosparam command="load" file="$(find project_bringup)/config/gcs/lidar_streaming/server_topics.yaml"/>
+    <rosparam command="load" file="$(find intrepid_streaming)/config/max_server_topics.yaml"/>
     <!-- if bidirectional traffic over a topic is expected, fill this parameter -->
     <rosparam param="ignored_publishers" if="$(arg allow_bidirectional)">["/tcp_receiver"]</rosparam>
     <rosparam param="ignored_publishers" unless="$(arg allow_bidirectional)">[]</rosparam>
 
   </node>
-
+  
 </launch>
 
 
