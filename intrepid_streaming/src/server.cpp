@@ -126,9 +126,9 @@ int main(int argc, char **argv)
   compressed_publisher_ = nh.advertise<intrepid_streaming_msgs::CompressedUGVStream>("compressed_ugv_stream", 1);
 
   message_filters::Subscriber<sensor_msgs::PointCloud2> lidar_subscriber(nh, "/robot/top_3d_laser/points/filtered", 1);
-  message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/robot/camera_ugv/color/image_raw/compressed", 1);
-  message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/robot/camera_ugv/aligned_depth_to_color/image_raw/compressedDepth", 1);
-  message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/robot/camera_ugv/color/camera_info", 1);
+  message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/robot/camera_ugv_1/color/image_raw/compressed", 1);
+  message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/robot/camera_ugv_1/aligned_depth_to_color/image_raw/compressedDepth", 1);
+  message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/robot/camera_ugv_1/color/camera_info", 1);
   message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_gps_subscriber(nh, "/robot/gps/fix", 1);
   message_filters::Subscriber<nav_msgs::Odometry> ugv_odom_subscriber(nh, "/robot/robotnik_base_control/odom", 1);
   
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
        transforms_received = false;
      }
 
-     if(listener.waitForTransform("/camera_ugv_link", "/robot_base_link", ros::Time(0), ros::Duration(1.0)) == false)
+     if(listener.waitForTransform("/camera_ugv_1_link", "/robot_base_link", ros::Time(0), ros::Duration(1.0)) == false)
      {
        ROS_WARN_STREAM("Waiting for transform from camera_link to robot_base_link");
        transforms_received = false;
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
    quaternion = lidar_transform.getRotation();
    tf::quaternionTFToMsg(quaternion, lidar_pose_.orientation);
 
-   listener.lookupTransform("/camera_ugv_link", "/robot_base_link",
+   listener.lookupTransform("/camera_ugv_1_link", "/robot_base_link",
    ros::Time(0), camera_transform);
    camera_pose_.position.x = camera_transform.getOrigin().x();
    camera_pose_.position.y = camera_transform.getOrigin().y();
