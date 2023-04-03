@@ -129,7 +129,8 @@ int main(int argc, char **argv)
   message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/robot/camera_ugv_1/color/image_raw/compressed", 1);
   message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/robot/camera_ugv_1/aligned_depth_to_color/image_raw/compressedDepth", 1);
   message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/robot/camera_ugv_1/color/camera_info", 1);
-  message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_gps_subscriber(nh, "/robot/gps/fix", 1);
+  // message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_gps_subscriber(nh, "/robot/gps/fix", 1);
+  message_filters::Subscriber<sensor_msgs::NavSatFix> ugv_gps_subscriber(nh, "/ugv_gps_coordinates", 1);
   message_filters::Subscriber<nav_msgs::Odometry> ugv_odom_subscriber(nh, "/robot/robotnik_base_control/odom", 1);
   
   message_filters::Synchronizer<testSyncPolicy> sync(testSyncPolicy(100), lidar_subscriber, rgb_subscriber, depth_subscriber, camera_info_subscriber, ugv_gps_subscriber, ugv_odom_subscriber);
