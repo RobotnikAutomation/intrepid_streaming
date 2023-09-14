@@ -125,7 +125,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   compressed_publisher_ = nh.advertise<intrepid_streaming_msgs::CompressedUGVStream>("compressed_ugv_stream", 1);
 
-  message_filters::Subscriber<sensor_msgs::PointCloud2> lidar_subscriber(nh, "/robot/top_3d_laser/points/filtered", 1);
+  message_filters::Subscriber<sensor_msgs::PointCloud2> lidar_subscriber(nh, "/robot/top_3d_laser/points/republished/filtered", 1);
   message_filters::Subscriber<sensor_msgs::CompressedImage> rgb_subscriber(nh, "/robot/camera_ugv_1/color/image_raw/compressed", 1);
   message_filters::Subscriber<sensor_msgs::CompressedImage> depth_subscriber(nh, "/robot/camera_ugv_1/aligned_depth_to_color/image_raw/compressedDepth", 1);
   message_filters::Subscriber<sensor_msgs::CameraInfo> camera_info_subscriber(nh, "/robot/camera_ugv_1/color/camera_info", 1);
